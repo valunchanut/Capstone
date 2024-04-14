@@ -1,21 +1,22 @@
-from data_cleaning_final import clean_sales_data
+
 from prophet import Prophet
 import pandas as pd
 import numpy as np
 
-# Obtain the cleaned data from the clean_sales_data function
-cleaned_data = clean_sales_data()
 
 # Define the forecast_sales function to perform forecasting on the cleaned data
-def forecast_sales(dataframe, future_days=2):
+def forecast_sales(dataframe, start_date, end_date, future_days=2):
     all_forecasts = pd.DataFrame()
     products = dataframe.columns.tolist()
+
+    # Filter the dataframe based on the provided start and end dates
+    filtered_data = dataframe.loc[start_date:end_date]
 
     for product in products:
         model = Prophet(daily_seasonality=False, yearly_seasonality=False,
                         growth='linear', seasonality_mode='multiplicative',
                         weekly_seasonality=True, holidays=None)
-        sales_data = dataframe[[product]].reset_index().rename(columns={'index': 'ds', product: 'y'})
+        sales_data = filtered_data[[product]].reset_index().rename(columns={'index': 'ds', product: 'y'})
         sales_data['floor'] = 0
 
         model.fit(sales_data)
@@ -31,16 +32,13 @@ def forecast_sales(dataframe, future_days=2):
     all_forecasts = all_forecasts.astype(int)
     return all_forecasts
 
-# Perform the forecasting using the cleaned data
-forecasted_data = forecast_sales(cleaned_data)
 
-# Combine the cleaned and forecasted data
-# Ensure the indices are aligned properly before combining
-forecasted_data = forecasted_data.reindex(cleaned_data.index.union(forecasted_data.index))
-updated_data = cleaned_data.combine_first(forecasted_data)
 
-# Display the updated DataFrame
-print(updated_data.tail())
+# start_date_str = '2024-01-01'
+# end_date_str = '2024-01-04'
 
-output_csv_path = '../updated_sales_data.csv'
-updated_data.to_csv(output_csv_path)
+# # Convert start_date and end_date strings to datetime objects
+# start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+# end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+
+# forecasted_data = forecast_sales(cleaned_data, start_date, end_date)
