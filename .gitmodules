@@ -1,0 +1,3 @@
+[submodule "simplified/frontend"]
+	path = simplified/frontend
+	url = https://github.com/valunchanut/Capstone/tree/main/simplified/frontend.git
