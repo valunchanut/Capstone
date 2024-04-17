@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from datetime import date
 from pydantic import BaseModel, Field
 from forecaste import forecast_sales  # Ensure this is updated to accept date ranges
@@ -9,6 +10,14 @@ cleaned_data = cleaned_data
 
 # Define FastAPI app
 app = FastAPI()
+# Allow requests from all origins (replace '*' with specific origins if needed)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],  # Allow specific HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Define request model
 class ForecastRequest(BaseModel):
